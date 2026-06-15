@@ -75,7 +75,6 @@ function HeaderHtml([string]$Prefix, [bool]$Landing) {
     $nav = @"
       <nav class="site-nav" id="site-nav" aria-label="ניווט ראשי">
         <a href="${homeHref}#services">שירותים</a>
-        <a href="${Prefix}mehiron-hovalot/">מחירון</a>
         <a href="${Prefix}azorei-sherut/">אזורי שירות</a>
         <a href="${Prefix}blog/">מדריכים</a>
         <a href="${Prefix}contact/">צור קשר</a>
@@ -131,7 +130,6 @@ function FooterHtml([string]$Prefix, [bool]$Landing) {
       </div>
       <div>
         <h3>מידע שימושי</h3>
-        <a href="${Prefix}mehiron-hovalot/">מחירון הובלות</a>
         <a href="${Prefix}azorei-sherut/">אזורי שירות</a>
         <a href="${Prefix}blog/">מדריכים</a>
         <a href="${Prefix}privacy/">מדיניות פרטיות</a>
@@ -144,7 +142,7 @@ function FooterHtml([string]$Prefix, [bool]$Landing) {
       </div>
     </div>
     <div class="container footer-bottom">
-      אזורי שירות: $ServiceAreaText. המחירים באתר הם טווחים כלליים בלבד ומשתנים לפי כמות ציוד, קומות, מעלית, מרחק, פירוק והרכבה ושירותי אריזה.
+      אזורי שירות: $ServiceAreaText. להצעת מחיר מדויקת שלחו פרטים ותמונות בוואטסאפ.
     </div>
   </footer>
 "@
@@ -215,34 +213,6 @@ function FaqHtml([array]$Faqs) {
 "@
   }
   return $html
-}
-
-function PriceCardsHtml {
-  return @"
-      <div class="price-grid">
-        <div class="price-card">
-          <h3>הובלת פריט בודד</h3>
-          <span class="price-value">החל מ-250-450 ₪</span>
-          <p>מתאים למקרר, ספה, מכונת כביסה, ארון קטן או פריט בודד אחר.</p>
-        </div>
-        <div class="price-card">
-          <h3>הובלה קטנה</h3>
-          <span class="price-value">החל מ-450-900 ₪</span>
-          <p>כמה פריטים, סטודיו קטן, מחסן או העברה מהירה בתוך המרכז.</p>
-        </div>
-        <div class="price-card">
-          <h3>דירת חדר / שני חדרים</h3>
-          <span class="price-value">החל מ-900-1,800 ₪</span>
-          <p>טווח כללי לדירה קטנה, לפי כמות ציוד, קומות ומרחק.</p>
-        </div>
-        <div class="price-card">
-          <h3>דירה גדולה</h3>
-          <span class="price-value">לפי בדיקה</span>
-          <p>בדירה גדולה נבנה הצעה לפי פירוט הציוד, גישה, מעלית ושירותים נלווים.</p>
-        </div>
-      </div>
-      <p class="notice">המחיר הסופי תלוי בכמות הציוד, קומות, מעלית, מרחק, צורך בפירוק והרכבה ושירותי אריזה.</p>
-"@
 }
 
 function AreaTagsHtml([string]$Prefix) {
@@ -350,7 +320,7 @@ $Body
 }
 
 $HomeFaqs = @(
-  @("כמה עולה הובלה במרכז?", "המחיר משתנה לפי כמות הציוד, קומות, מעלית, מרחק, פירוק והרכבה ושירותי אריזה. באתר מופיעים טווחים כלליים כדי לתת כיוון ראשוני."),
+  @("איך מקבלים הצעת מחיר?", "שולחים כמה פרטים על הציוד, עיר איסוף, עיר יעד, קומה, מעלית ותאריך רצוי. אפשר לצרף תמונות בוואטסאפ כדי לדייק את ההצעה."),
   @("האם אפשר לקבל הצעת מחיר בוואטסאפ?", "כן. אפשר לשלוח פרטים ותמונות בוואטסאפ ולקבל הצעת מחיר מסודרת במהירות."),
   @("האם אתם עושים הובלות קטנות?", "כן. האתר מותאם גם להובלות קטנות, פריטים בודדים, סטודיו קטן ומחסן."),
   @("האם יש פירוק והרכבת רהיטים?", "אפשר לשלב פירוק והרכבה לפי סוג הרהיט והצורך בפועל."),
@@ -367,7 +337,6 @@ $LocalBusinessSchema = [ordered]@{
   telephone = $PhoneDisplay
   image = "$BaseUrl/assets/images/hero-moving-team.png"
   url = "$BaseUrl/"
-  priceRange = "₪₪"
   address = [ordered]@{ "@type" = "PostalAddress"; addressCountry = "IL"; addressRegion = "מרכז" }
 }
 
@@ -442,18 +411,6 @@ $homeBody = @"
           <div class="card step"><h3>קובעים שעה</h3><p>מתאמים מועד שמתאים לכם ולצוות.</p></div>
           <div class="card step"><h3>מובילים מסודר</h3><p>מגיעים, עוטפים, מעמיסים ומסיימים בצורה נקייה.</p></div>
         </div>
-      </div>
-    </section>
-    <section class="section">
-      <div class="container">
-        <div class="section-heading">
-          <div>
-            <h2>מחירון הובלות כללי</h2>
-            <p>טווחים ראשוניים כדי להבין סדר גודל. הצעת מחיר מדויקת ניתנת לפי הפרטים שלכם.</p>
-          </div>
-          <a class="btn btn-outline" href="mehiron-hovalot/">למחירון המלא</a>
-        </div>
-        $(PriceCardsHtml)
       </div>
     </section>
     <section class="section alt">
@@ -553,7 +510,7 @@ foreach ($service in $services) {
           <p>לפני ההובלה חשוב לציין כמה שיותר פרטים: מספר פריטים, קומה, מעלית, מרחק הליכה מהחניה, פירוק והרכבה אם צריך, ותאריך רצוי. ככל שהמידע מדויק יותר, כך הצעת המחיר תהיה ברורה יותר.</p>
           <div class="cta-row">
             <a class="btn btn-green" href="#" data-whatsapp>שלחו פרטים בוואטסאפ</a>
-            <a class="btn btn-outline" href="../mehiron-hovalot/">בדקו טווחי מחיר</a>
+            <a class="btn btn-outline" href="#quote">קבלו הצעת מחיר</a>
           </div>
           <h2>שאלות נפוצות</h2>
           <div class="faq">$(FaqHtml $faqs)</div>
@@ -577,26 +534,6 @@ foreach ($service in $services) {
   $schema = [ordered]@{ "@context" = "https://schema.org"; "@type" = "Service"; serviceType = $service.Title; provider = [ordered]@{ "@type" = "MovingCompany"; name = $BusinessName }; areaServed = "אזור המרכז" }
   Write-Page "$($service.Slug)/index.html" "$($service.Title) | $BusinessName" $service.Meta $body @($schema, (FaqSchema $faqs))
 }
-
-$priceFaqs = @(
-  @("למה המחיר באתר הוא טווח ולא מחיר סופי?", "כי מחיר הובלה תלוי בפרטים משתנים כמו ציוד, קומות, מעלית, מרחק, פירוק והרכבה וזמינות."),
-  @("מה הדרך הכי מהירה לקבל מחיר מדויק?", "לשלוח בוואטסאפ תמונות, עיר איסוף, עיר יעד, קומה, מעלית ותאריך רצוי."),
-  @("האם המחיר כולל פירוק והרכבה?", "רק אם זה סוכם מראש כחלק מההצעה.")
-)
-$priceBody = @"
-    <section class="page-hero">
-      <div class="container">
-        <div class="breadcrumbs"><a href="../">דף הבית</a> / מחירון</div>
-        <h1>מחירון הובלות במרכז</h1>
-        <p>כמה עולה הובלה קטנה או גדולה? הנה טווחים כלליים שיעזרו להבין סדר גודל לפני קבלת הצעה מדויקת.</p>
-        <div class="cta-row"><a class="btn btn-primary" href="#quote">קבל הצעת מחיר</a><a class="btn btn-green" href="#" data-whatsapp>וואטסאפ</a></div>
-      </div>
-    </section>
-    <section class="section"><div class="container">$(PriceCardsHtml)</div></section>
-    <section class="section lead-section" id="quote"><div class="container lead-wrap"><div class="lead-copy"><h2>רוצים מחיר לפי הפרטים שלכם?</h2><p>מלאו כמה שדות ונפתח לכם וואטסאפ עם הודעה מסודרת.</p></div><div class="lead-panel">$(LeadFormHtml $false)</div></div></section>
-    <section class="section alt"><div class="container"><div class="section-heading"><div><h2>שאלות על מחיר ההובלה</h2></div></div><div class="faq">$(FaqHtml $priceFaqs)</div></div></section>
-"@
-Write-Page "mehiron-hovalot/index.html" "מחירון הובלות במרכז | כמה עולה הובלה קטנה או גדולה? | $BusinessName" "מחירון הובלות במרכז עם טווחי מחיר כלליים להובלת פריט בודד, הובלה קטנה, דירה קטנה ודירה גדולה." $priceBody @((FaqSchema $priceFaqs))
 
 $areasBody = @"
     <section class="page-hero">
@@ -737,10 +674,9 @@ $landingBody = @"
     </section>
     <section class="section lead-section" id="quote"><div class="container lead-wrap"><div class="lead-copy"><h2>טופס מהיר להצעת מחיר</h2><p>מלאו את הפרטים החשובים בלבד. ההודעה תיפתח בוואטסאפ ותוכלו לצרף תמונות.</p><ul class="lead-points"><li>מחיר הוגן לפי פרטי ההובלה</li><li>שירות אישי וזמינות גבוהה</li><li>שמירה על הציוד</li></ul></div><div class="lead-panel">$(LeadFormHtml $true)</div></div></section>
     <section class="section"><div class="container"><div class="section-heading"><div><h2>אזורי שירות</h2><p>$ServiceAreaText.</p></div></div>$(AreaTagsHtml "../../")</div></section>
-    <section class="section alt"><div class="container"><div class="section-heading"><div><h2>טווחי מחיר כלליים</h2></div></div>$(PriceCardsHtml)</div></section>
     <section class="section"><div class="container grid grid-2"><div><h2>למה להשאיר פרטים?</h2><ul class="why-list"><li>הצעה לפי הציוד שלכם</li><li>אפשר לשלוח תמונות</li><li>מענה מהיר לתיאום</li></ul></div><div><h2>שאלות קצרות</h2><div class="faq">$(FaqHtml $landingFaqs)</div></div></div></section>
 "@
-Write-Page "lp/hovalot-bamerkaz/index.html" "הובלות במרכז | הצעת מחיר מהירה | $BusinessName" "דף נחיתה לקמפיין הובלות במרכז: טופס מהיר, וואטסאפ, טווחי מחיר ואזורי שירות." $landingBody @((FaqSchema $landingFaqs)) $true
+Write-Page "lp/hovalot-bamerkaz/index.html" "הובלות במרכז | הצעת מחיר מהירה | $BusinessName" "דף נחיתה לקמפיין הובלות במרכז: טופס מהיר, וואטסאפ, שירותי הובלה ואזורי שירות." $landingBody @((FaqSchema $landingFaqs)) $true
 
 $sitemapUrls = ($Pages | ForEach-Object { "  <url><loc>$_</loc></url>" }) -join "`n"
 Write-TextFile "sitemap.xml" @"
