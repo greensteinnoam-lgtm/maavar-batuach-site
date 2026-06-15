@@ -1,9 +1,9 @@
 ﻿$ErrorActionPreference = "Stop"
 
 $Root = Split-Path -Parent $PSScriptRoot
-$BaseUrl = "https://example.com"
+$BaseUrl = "https://greensteinnoam-lgtm.github.io/maavar-batuach-site"
 $BusinessName = "מעבר בטוח"
-$PhoneDisplay = "050-000-0000"
+$PhoneDisplay = "055-2463716"
 $ServiceAreaText = "תל אביב, רמת גן, גבעתיים, חולון, בת ים, ראשון לציון, פתח תקווה, בני ברק, הרצליה, רעננה, כפר סבא, קריית אונו, אור יהודה, יהוד, אזור וגבעת שמואל"
 $Pages = New-Object System.Collections.Generic.List[string]
 
@@ -14,7 +14,7 @@ function HtmlEncode([string]$Value) {
 function Get-UrlPath([string]$OutFile) {
   $rel = ($OutFile -replace "\\", "/")
   if ($rel -eq "index.html") { return "/" }
-  if ($rel.EndsWith("/index.html")) { return "/" + $rel.Substring(0, $rel.Length - 10) + "/" }
+  if ($rel.EndsWith("/index.html")) { return "/" + $rel.Substring(0, $rel.Length - "/index.html".Length) + "/" }
   return "/" + $rel
 }
 

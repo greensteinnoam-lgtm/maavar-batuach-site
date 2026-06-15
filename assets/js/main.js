@@ -1,10 +1,10 @@
 (function () {
   const config = {
     businessName: "מעבר בטוח",
-    phoneDisplay: "050-000-0000",
-    phoneHref: "0500000000",
-    whatsappNumber: "972500000000",
-    email: "leads@example.com",
+    phoneDisplay: "055-2463716",
+    phoneHref: "0552463716",
+    whatsappNumber: "972552463716",
+    email: "",
     defaultMessage:
       "שלום, אני צריך הצעת מחיר להובלה. עיר איסוף: __ עיר יעד: __ מה מובילים: __ תאריך רצוי: __",
   };
@@ -36,6 +36,10 @@
     });
 
     qsa("[data-email]").forEach((link) => {
+      if (!config.email) {
+        link.remove();
+        return;
+      }
       link.setAttribute("href", `mailto:${config.email}`);
       link.textContent = config.email;
     });
