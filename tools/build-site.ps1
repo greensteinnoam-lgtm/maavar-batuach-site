@@ -363,7 +363,7 @@ $homeBody = @"
       <div class="container hero-grid">
         <div class="hero-copy">
           <p class="eyebrow">$BusinessName - הובלות במרכז, בשפלה ובירושלים</p>
-          <h1><span class="hero-title-full">הובלות במרכז, בשפלה ובירושלים — בלי כאב ראש</span><span class="hero-title-mobile">הובלות בלי כאב ראש</span></h1>
+          <h1>הובלות במרכז, בשפלה ובירושלים — בלי כאב ראש</h1>
           <p>מעבר בטוח מבצעת הובלות קטנות וגדולות, דירות, משרדים, אריזה ופירוק והרכבה — עם תיאום ברור מראש, שמירה על הציוד והצעת מחיר מהירה בוואטסאפ.</p>
           <p class="hero-trust-line">תיאום ברור מראש, שמירה על הציוד ומענה מהיר בוואטסאפ.</p>
           <ul class="hero-points" aria-label="יתרונות השירות">

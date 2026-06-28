@@ -299,14 +299,6 @@ body.menu-open .site-nav {
   font-weight: 900;
 }
 
-.hero-title-full {
-  display: none;
-}
-
-.hero-title-mobile {
-  display: inline;
-}
-
 .hero p,
 .page-hero p {
   max-width: 660px;
@@ -970,14 +962,6 @@ textarea:focus {
 
   .eyebrow {
     display: inline-flex;
-  }
-
-  .hero-title-full {
-    display: inline;
-  }
-
-  .hero-title-mobile {
-    display: none;
   }
 
   .hero .hero-copy > p:not(.eyebrow):not(.hero-trust-line) {
