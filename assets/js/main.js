@@ -27,12 +27,40 @@
     return link ? link.getAttribute("href") || "" : "";
   }
 
+  function baseWhatsappUrl(config) {
+    const contact = contactConfig(config);
+    const href = contact.whatsappUrl || existingHref("[data-whatsapp]");
+    return href ? href.split("?")[0] : "";
+  }
+
+  function whatsappHref(config, message) {
+    const baseUrl = baseWhatsappUrl(config);
+    const text = message || contactConfig(config).whatsappMessage || "";
+    if (!baseUrl) return "";
+    if (!text) return baseUrl;
+    return `${baseUrl}?text=${encodeURIComponent(text)}`;
+  }
+
+  function formMessage(form) {
+    const data = new FormData(form);
+    const value = (name) => String(data.get(name) || "").trim();
+
+    return [
+      "שלום, אני צריך הצעת מחיר להובלה.",
+      `עיר איסוף: ${value("pickup")}`,
+      `עיר יעד: ${value("destination")}`,
+      `מה מובילים: ${value("items")}`,
+      `תאריך רצוי: ${value("date")}`,
+      `האם יש מעלית: ${value("elevator")}`,
+    ].join("\n");
+  }
+
   function updateContactLinks(config) {
     const contact = contactConfig(config);
     const businessName = config.businessName || "";
     const phoneDisplay = contact.phoneDisplay || "";
     const phoneHref = contact.phoneHref || existingHref("[data-call]");
-    const whatsappUrl = contact.whatsappUrl || existingHref("[data-whatsapp]");
+    const whatsappUrl = whatsappHref(config);
     const email = contact.email || "";
 
     if (businessName) {
@@ -73,11 +101,11 @@
   }
 
   function bindForms(config) {
-    const whatsappUrl = contactConfig(config).whatsappUrl || existingHref("[data-whatsapp]");
     qsa("form[data-lead-form]").forEach((form) => {
       form.addEventListener("submit", (event) => {
         event.preventDefault();
-        if (whatsappUrl) window.open(whatsappUrl, "_blank", "noopener");
+        const href = whatsappHref(config, formMessage(form));
+        if (href) window.open(href, "_blank", "noopener");
       });
     });
   }

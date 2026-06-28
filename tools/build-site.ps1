@@ -9,6 +9,8 @@ $PhoneDisplay = $Config.contact.phoneDisplay
 $PhoneHref = $Config.contact.phoneHref
 $PhoneSchema = $PhoneHref -replace "^tel:", ""
 $WhatsappUrl = $Config.contact.whatsappUrl
+$WhatsappMessage = $Config.contact.whatsappMessage
+$WhatsappHref = if ([string]::IsNullOrWhiteSpace($WhatsappMessage)) { $WhatsappUrl } else { "$WhatsappUrl`?text=$([System.Uri]::EscapeDataString($WhatsappMessage))" }
 $ServiceAreaText = $Config.serviceAreas.summary
 $ConfiguredServices = @($Config.services)
 $Pages = New-Object System.Collections.Generic.List[string]
@@ -110,8 +112,8 @@ function HeaderHtml([string]$Prefix, [bool]$Landing) {
       </a>
       $nav
       <div class="header-actions">
-        <a class="btn btn-green" href="$WhatsappUrl" data-whatsapp>וואטסאפ</a>
-        <a class="btn btn-primary" href="$PhoneHref" data-call>התקשר</a>
+        <a class="btn btn-green" href="$WhatsappHref" data-whatsapp>וואטסאפ מהיר</a>
+        <a class="btn btn-primary" href="$PhoneHref" data-call>התקשרו</a>
         <button class="menu-toggle" type="button" data-menu-toggle aria-controls="site-nav" aria-expanded="false" aria-label="פתיחת תפריט">
           <span></span><span></span><span></span>
         </button>
@@ -138,7 +140,7 @@ function FooterHtml([string]$Prefix, [bool]$Landing) {
     <div class="container footer-grid">
       <div>
         <h2 data-business-name>$BusinessName</h2>
-        <p>הובלות קטנות וגדולות באזור המרכז, עם שירות אישי, הצעת מחיר ברורה ושמירה על הציוד.</p>
+        <p>הובלות קטנות וגדולות במרכז, בשפלה ובירושלים, עם שירות אישי, הצעת מחיר ברורה ושמירה על הציוד.</p>
         <p>טלפון: <a href="$PhoneHref" data-call data-phone-text>$PhoneDisplay</a></p>
       </div>
       <div>
@@ -147,13 +149,14 @@ $footerServiceLinks
       </div>
       <div>
         <h3>מידע שימושי</h3>
+        <a href="${Prefix}mehiron-hovalot/">בדיקת מחיר</a>
         <a href="${Prefix}azorei-sherut/">אזורי שירות</a>
         <a href="${Prefix}blog/">מדריכים</a>
         <a href="${Prefix}privacy/">מדיניות פרטיות</a>
       </div>
       <div>
         <h3>יצירת קשר</h3>
-        <a href="$WhatsappUrl" data-whatsapp>שליחת וואטסאפ</a>
+        <a href="$WhatsappHref" data-whatsapp>שליחת וואטסאפ</a>
         <a href="$PhoneHref" data-call>התקשר עכשיו</a>
         <a href="${Prefix}contact/">טופס הצעת מחיר</a>
       </div>
@@ -216,6 +219,34 @@ function LeadFormHtml([bool]$Compact) {
     <button class="btn btn-primary" type="submit">שלחו לי הצעת מחיר</button>
     <p class="form-note">הטופס פותח וואטסאפ ליצירת קשר מהירה.</p>
   </form>
+"@
+}
+
+function HeroLeadFormHtml {
+  return @"
+          <form class="lead-form hero-lead-form" data-lead-form>
+            <div class="field">
+              <label for="hero-name">שם</label>
+              <input id="hero-name" name="name" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label for="hero-phone">טלפון</label>
+              <input id="hero-phone" name="phone" inputmode="tel" autocomplete="tel" required>
+            </div>
+            <div class="field">
+              <label for="hero-pickup">עיר איסוף</label>
+              <input id="hero-pickup" name="pickup" autocomplete="address-level2">
+            </div>
+            <div class="field">
+              <label for="hero-destination">עיר יעד</label>
+              <input id="hero-destination" name="destination" autocomplete="address-level2">
+            </div>
+            <div class="field full">
+              <label for="hero-items">מה מובילים?</label>
+              <textarea id="hero-items" name="items"></textarea>
+            </div>
+            <button class="btn btn-primary" type="submit">שלחו בקשה להצעת מחיר</button>
+          </form>
 "@
 }
 
@@ -293,10 +324,10 @@ function Write-Page([string]$OutFile, [string]$Title, [string]$Description, [str
 $Body
   </main>
   $footer
-  <a class="floating-whatsapp btn btn-green" href="$WhatsappUrl" data-whatsapp aria-label="שליחת וואטסאפ">וואטסאפ</a>
+  <a class="floating-whatsapp btn btn-green" href="$WhatsappHref" data-whatsapp aria-label="שליחת וואטסאפ">וואטסאפ</a>
   <nav class="mobile-bottom" aria-label="פעולות מהירות במובייל">
     <a href="$PhoneHref" data-call>התקשר</a>
-    <a href="$WhatsappUrl" data-whatsapp>וואטסאפ</a>
+    <a href="$WhatsappHref" data-whatsapp>וואטסאפ</a>
     <a href="#quote">הצעת מחיר</a>
   </nav>
   <script src="${prefix}assets/js/main.js" defer></script>
@@ -329,31 +360,43 @@ $LocalBusinessSchema = [ordered]@{
 
 $homeBody = @"
     <section class="hero">
-      <div class="container">
+      <div class="container hero-grid">
         <div class="hero-copy">
-          <p class="eyebrow">$BusinessName - הובלות במרכז</p>
-          <h1>הובלות במרכז - קטנות וגדולות, מהר, מסודר ובמחיר הוגן</h1>
-          <p>צריכים מוביל אמין במרכז? הובלות דירה, משרדים ופריטים בודדים עם שירות אישי, זמינות גבוהה והצעת מחיר מהירה בוואטסאפ.</p>
+          <p class="eyebrow">$BusinessName - הובלות במרכז, בשפלה ובירושלים</p>
+          <h1><span class="hero-title-full">הובלות במרכז, בשפלה ובירושלים — בלי כאב ראש</span><span class="hero-title-mobile">הובלות בלי כאב ראש</span></h1>
+          <p>מעבר בטוח מבצעת הובלות קטנות וגדולות, דירות, משרדים, אריזה ופירוק והרכבה — עם תיאום ברור מראש, שמירה על הציוד והצעת מחיר מהירה בוואטסאפ.</p>
+          <p class="hero-trust-line">תיאום ברור מראש, שמירה על הציוד ומענה מהיר בוואטסאפ.</p>
+          <ul class="hero-points" aria-label="יתרונות השירות">
+            <li>הובלות קטנות וגדולות</li>
+            <li>הובלות דירה ומשרדים</li>
+            <li>פירוק והרכבה לפי צורך</li>
+            <li>שירות מאשקלון עד חיפה</li>
+            <li>הצעת מחיר בוואטסאפ</li>
+          </ul>
           <div class="cta-row">
-            <a class="btn btn-primary" href="#quote">קבל הצעת מחיר</a>
-            <a class="btn btn-green" href="$WhatsappUrl" data-whatsapp>קבל הצעת מחיר בוואטסאפ</a>
-            <a class="btn btn-light" href="$PhoneHref" data-call>התקשר עכשיו</a>
+            <a class="btn btn-green btn-xl" href="$WhatsappHref" data-whatsapp>קבלו הצעת מחיר בוואטסאפ</a>
+            <a class="btn btn-light" href="$PhoneHref" data-call>התקשרו עכשיו</a>
           </div>
-          <div class="hero-stats" aria-label="יתרונות מרכזיים">
-            <div class="stat"><strong>מרכז</strong><span>אזורי שירות רחבים</span></div>
-            <div class="stat"><strong>מהיר</strong><span>הצעה בוואטסאפ</span></div>
-            <div class="stat"><strong>מסודר</strong><span>ציוד עטוף ומוגן</span></div>
-          </div>
+          <ul class="hero-mobile-trust" aria-label="נקודות אמון">
+            <li>הצעה מהירה בוואטסאפ</li>
+            <li>שמירה על הציוד</li>
+            <li>שירות מאשקלון עד חיפה</li>
+          </ul>
+        </div>
+        <div class="hero-form-panel lead-panel" aria-label="טופס הצעת מחיר מהירה">
+          <h2>הצעת מחיר מהירה</h2>
+          <p>השאירו פרטים ונחזור לתיאום לפי הציוד, הכתובות והזמינות.</p>
+          $(HeroLeadFormHtml)
         </div>
       </div>
     </section>
     <section class="trust-strip" aria-label="פס אמון">
       <div class="container trust-grid">
-        <div class="trust-item">זמינות גבוהה באזור המרכז</div>
-        <div class="trust-item">הובלות קטנות וגדולות</div>
-        <div class="trust-item">פירוק והרכבת רהיטים</div>
-        <div class="trust-item">יחס אישי ומחיר הוגן</div>
-        <div class="trust-item">שמירה על הציוד</div>
+        <div class="trust-item">תיאום ברור מראש</div>
+        <div class="trust-item">בדיקת גישה וקומות</div>
+        <div class="trust-item">עטיפה ושמירה על ציוד</div>
+        <div class="trust-item">הצעה מסודרת בוואטסאפ</div>
+        <div class="trust-item">שירות מאשקלון עד חיפה</div>
       </div>
     </section>
     <section class="section" id="services">
@@ -374,7 +417,7 @@ $homeBody = @"
           <h2>קבלו הצעת מחיר מהירה וברורה</h2>
           <p>מלאו כמה פרטים בסיסיים, או שלחו תמונות בוואטסאפ. נחזור עם שאלה משלימה אם צריך ונבנה הצעה שמתאימה להובלה שלכם.</p>
           <ul class="lead-points">
-            <li>לא מנפחים הבטחות - בודקים את פרטי ההובלה.</li>
+            <li>בודקים את הפרטים לפני שמתחייבים למחיר.</li>
             <li>אפשר לשלוח תמונות כדי לדייק את המחיר.</li>
             <li>מתאים להובלות קטנות, דירות ומשרדים.</li>
           </ul>
@@ -420,20 +463,20 @@ $homeBody = @"
           </div>
         </div>
         <ul class="why-list">
-          <li>מגיעים בזמן</li>
-          <li>שומרים על הציוד</li>
+          <li>תיאום הגעה מסודר</li>
+          <li>שמירה על הציוד בזמן העמסה</li>
           <li>הצעת מחיר ברורה מראש</li>
-          <li>שירות אישי וישיר</li>
-          <li>מתאים לקטנות ולגדולות</li>
-          <li>אפשר לשלוח תמונות להצעה מהירה</li>
+          <li>בדיקת קומות, מעלית וגישה</li>
+          <li>מתאים להובלות קטנות וגדולות</li>
+          <li>אפשר לשלוח תמונות להצעה מדויקת</li>
         </ul>
       </div>
     </section>
     <section class="section alt">
       <div class="container grid grid-2">
         <div>
-          <div class="section-heading"><div><h2>המלצות</h2><p>כאן יופיעו המלצות אמיתיות בלבד לאחר שייאספו מהלקוחות.</p></div></div>
-          <div class="testimonial-ready">אזור מוכן להמלצות אמיתיות. לא הוכנסו המלצות מומצאות.</div>
+          <div class="section-heading"><div><h2>סטנדרט עבודה ברור</h2><p>לפני שמגיעים, מוודאים את פרטי ההובלה כדי לצמצם הפתעות ביום המעבר.</p></div></div>
+          <div class="testimonial-ready">בודקים עיר איסוף, עיר יעד, קומה, מעלית, גישה לבניין, כמות ציוד וצורך בפירוק או אריזה. כך הצוות מגיע מוכן יותר, והלקוח יודע למה לצפות.</div>
         </div>
         <div>
           <div class="section-heading"><div><h2>שאלות נפוצות</h2><p>תשובות קצרות לפני שמתקשרים.</p></div></div>
@@ -449,7 +492,7 @@ $homeBody = @"
             <p>שלחו פרטים עכשיו ונחזור עם כיוון מסודר.</p>
           </div>
           <div class="cta-row">
-            <a class="btn btn-green" href="$WhatsappUrl" data-whatsapp>שליחת וואטסאפ</a>
+            <a class="btn btn-green" href="$WhatsappHref" data-whatsapp>שליחת וואטסאפ</a>
             <a class="btn btn-primary" href="$PhoneHref" data-call>התקשר עכשיו</a>
           </div>
         </div>
@@ -457,7 +500,7 @@ $homeBody = @"
     </section>
 "@
 
-Write-Page "index.html" "הובלות במרכז | הובלות קטנות וגדולות במחיר הוגן | $BusinessName" "צריכים הובלה במרכז? הובלות קטנות וגדולות, דירות, משרדים ופריטים בודדים. קבלו הצעת מחיר מהירה בוואטסאפ ושירות אמין ומסודר." $homeBody @($LocalBusinessSchema, (FaqSchema $HomeFaqs))
+Write-Page "index.html" "הובלות במרכז, בשפלה ובירושלים בלי כאב ראש | $BusinessName" "מעבר בטוח מבצעת הובלות קטנות וגדולות, דירות, משרדים, אריזה ופירוק והרכבה — עם תיאום ברור מראש, שמירה על הציוד והצעת מחיר מהירה בוואטסאפ." $homeBody @($LocalBusinessSchema, (FaqSchema $HomeFaqs))
 
 $services = @(
   [ordered]@{ Slug = "hovalot-ktanot"; Title = "הובלות קטנות במרכז"; Meta = "הובלות קטנות במרכז לפריטים בודדים, דירות קטנות ומעברים נקודתיים. קבלו הצעת מחיר מהירה בוואטסאפ."; Intro = "כשלא צריך משאית ענקית אלא צוות זריז ומדויק, הובלה קטנה יכולה לחסוך זמן וכסף. אנחנו מתאמים את ההובלה לפי כמות הציוד, הגישה לבניין והמרחק."; Points = @("פריטים בודדים, מחסנים וסטודיו קטן", "תיאום מהיר לפי זמינות", "שמירה על פריטים רגישים ועטיפה לפי צורך") },
@@ -482,7 +525,7 @@ foreach ($service in $services) {
         <p>$($service.Intro)</p>
         <div class="cta-row">
           <a class="btn btn-primary" href="#quote">קבל הצעת מחיר</a>
-          <a class="btn btn-green" href="$WhatsappUrl" data-whatsapp>וואטסאפ מהיר</a>
+          <a class="btn btn-green" href="$WhatsappHref" data-whatsapp>וואטסאפ מהיר</a>
           <a class="btn btn-light" href="$PhoneHref" data-call>התקשר עכשיו</a>
         </div>
       </div>
@@ -496,7 +539,7 @@ foreach ($service in $services) {
           <h2>איך מתאמים הובלה בלי הפתעות?</h2>
           <p>לפני ההובלה חשוב לציין כמה שיותר פרטים: מספר פריטים, קומה, מעלית, מרחק הליכה מהחניה, פירוק והרכבה אם צריך, ותאריך רצוי. ככל שהמידע מדויק יותר, כך הצעת המחיר תהיה ברורה יותר.</p>
           <div class="cta-row">
-            <a class="btn btn-green" href="$WhatsappUrl" data-whatsapp>שלחו פרטים בוואטסאפ</a>
+            <a class="btn btn-green" href="$WhatsappHref" data-whatsapp>שלחו פרטים בוואטסאפ</a>
             <a class="btn btn-outline" href="#quote">קבלו הצעת מחיר</a>
           </div>
           <h2>שאלות נפוצות</h2>
@@ -513,7 +556,7 @@ foreach ($service in $services) {
       <div class="container info-panel lead-panel">
         <div class="section-heading">
           <div><h2>רוצים לבדוק זמינות?</h2><p>אפשר להתקשר או לשלוח וואטסאפ עם תמונות של הציוד.</p></div>
-          <div class="cta-row"><a class="btn btn-green" href="$WhatsappUrl" data-whatsapp>וואטסאפ</a><a class="btn btn-primary" href="$PhoneHref" data-call>התקשר</a></div>
+          <div class="cta-row"><a class="btn btn-green" href="$WhatsappHref" data-whatsapp>וואטסאפ</a><a class="btn btn-primary" href="$PhoneHref" data-call>התקשר</a></div>
         </div>
       </div>
     </section>
@@ -522,13 +565,88 @@ foreach ($service in $services) {
   Write-Page "$($service.Slug)/index.html" "$($service.Title) | $BusinessName" $service.Meta $body @($schema, (FaqSchema $faqs))
 }
 
+$priceCheckFaqs = @(
+  @("למה אי אפשר לתת מחיר מדויק בלי פרטים?", "מחיר הובלה תלוי בפרטי העבודה בפועל: כמות הציוד, קומות, מעלית, מרחק הליכה, מרחק נסיעה, צורך בפירוק והרכבה ושירותי אריזה."),
+  @("איזה פרטים כדאי לשלוח בוואטסאפ?", "כדאי לשלוח עיר איסוף, עיר יעד, קומה, האם יש מעלית, מה מובילים, האם צריך פירוק והרכבה ותאריך רצוי."),
+  @("האם תמונות עוזרות לקבל הצעת מחיר?", "כן. תמונות של הרהיטים, הארגזים והגישה לבניין עוזרות להבין את היקף העבודה ולהחזיר הצעה מסודרת יותר.")
+)
+
+$priceCheckBody = @"
+    <section class="page-hero">
+      <div class="container">
+        <div class="breadcrumbs"><a href="../">דף הבית</a> / בדיקת מחיר</div>
+        <h1>בדיקת מחיר להובלה</h1>
+        <p>כדי לתת הצעה מסודרת צריך להבין את פרטי ההובלה, הגישה, כמות הציוד והשירותים הנלווים.</p>
+        <div class="cta-row">
+          <a class="btn btn-green" href="$WhatsappHref" data-whatsapp>בדיקת מחיר בוואטסאפ</a>
+          <a class="btn btn-light" href="$PhoneHref" data-call>התקשרו עכשיו</a>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="container split">
+        <article class="content">
+          <h2>איך נקבע מחיר הובלה?</h2>
+          <p>מחיר הובלה נקבע לפי העבודה בפועל: כמות הציוד, סוג הפריטים, קומות, מעלית, מרחק הליכה מהחניה, מרחק הנסיעה, צורך בפירוק והרכבה, שירותי אריזה וזמינות ביום המבוקש.</p>
+
+          <h2>למה אי אפשר לתת מחיר מדויק בלי פרטים?</h2>
+          <p>שתי הובלות שנראות דומות יכולות להיות שונות מאוד בשטח. דירה עם מעלית וגישה נוחה אינה דומה לדירה בלי מעלית, עם הליכה ארוכה או פריטים שדורשים פירוק. לכן ב$BusinessName בודקים קודם את הפרטים ורק אז חוזרים עם הצעת מחיר מסודרת.</p>
+
+          <h2>איזה פרטים צריך לשלוח?</h2>
+          <ul>
+            <li>עיר איסוף ועיר יעד.</li>
+            <li>קומה בכל צד והאם יש מעלית.</li>
+            <li>מה מובילים: רהיטים, מוצרי חשמל, ארגזים ופריטים רגישים.</li>
+            <li>האם צריך פירוק והרכבת רהיטים.</li>
+            <li>תאריך רצוי וגמישות בשעה.</li>
+            <li>פרטים על גישה, חניה או מרחק הליכה מהבניין.</li>
+          </ul>
+
+          <h2>איך לשלוח תמונות בוואטסאפ?</h2>
+          <p>אפשר לשלוח תמונות של הרהיטים, הארגזים, מוצרי החשמל והגישה לבניין. תמונות ברורות עוזרות להבין את נפח העבודה, לזהות פריטים שדורשים עטיפה או פירוק, ולצמצם אי הבנות לפני יום ההובלה.</p>
+
+          <h2>מה משפיע על המחיר?</h2>
+          <p>הגורמים המרכזיים הם נפח הציוד, משקל הפריטים, קומות, מעלית, מרחק מהחניה, מרחק הנסיעה, זמינות, שירותי אריזה ופירוק והרכבה. ככל שהפרטים מדויקים יותר, כך ההצעה תהיה ברורה יותר.</p>
+
+          <h2>איך להימנע מהפתעות ביום ההובלה?</h2>
+          <p>כדאי לשלוח מראש את כל הפרטים הרלוונטיים, לעדכן על פריטים כבדים או שבירים, לציין אם אין מעלית, ולצלם את הגישה לבניין אם היא מורכבת. כך אפשר לתאם נכון את הצוות, הזמן והציוד הנדרש.</p>
+
+          <div class="info-panel lead-panel">
+            <div class="section-heading">
+              <div>
+                <h2>שלחו פרטים בוואטסאפ וקבלו הצעת מחיר</h2>
+                <p>שלחו את פרטי ההובלה ותמונות אם יש, ונחזור עם הצעה מסודרת לפי העבודה בפועל.</p>
+              </div>
+              <div class="cta-row">
+                <a class="btn btn-green" href="$WhatsappHref" data-whatsapp>בדיקת מחיר בוואטסאפ</a>
+              </div>
+            </div>
+          </div>
+        </article>
+        <aside class="lead-panel sidebar-cta" id="quote">
+          <h2>בדיקת מחיר מהירה</h2>
+          <p>מלאו פרטים ונפתח הודעת וואטסאפ ליצירת קשר.</p>
+          $(LeadFormHtml $true)
+        </aside>
+      </div>
+    </section>
+    <section class="section alt">
+      <div class="container">
+        <div class="section-heading"><div><h2>שאלות נפוצות על בדיקת מחיר</h2></div></div>
+        <div class="faq">$(FaqHtml $priceCheckFaqs)</div>
+      </div>
+    </section>
+"@
+
+Write-Page "mehiron-hovalot/index.html" "בדיקת מחיר להובלה | $BusinessName" "צריכים לדעת כמה תעלה ההובלה? במעבר בטוח בודקים את פרטי ההובלה, כמות הציוד, קומות, מעלית, מרחק ושירותים נלווים — וחוזרים עם הצעת מחיר מסודרת בוואטסאפ." $priceCheckBody @((FaqSchema $priceCheckFaqs))
+
 $areasBody = @"
     <section class="page-hero">
       <div class="container">
         <div class="breadcrumbs"><a href="../">דף הבית</a> / אזורי שירות</div>
         <h1>אזורי שירות להובלות במרכז</h1>
         <p>שירותי הובלה במרכז הארץ, עם דפי עיר שמרכזים מידע מקומי, קישורים מהירים וטופס הצעת מחיר.</p>
-        <div class="cta-row"><a class="btn btn-green" href="$WhatsappUrl" data-whatsapp>בדיקת זמינות בוואטסאפ</a><a class="btn btn-primary" href="../contact/">השארת פרטים</a></div>
+        <div class="cta-row"><a class="btn btn-green" href="$WhatsappHref" data-whatsapp>בדיקת זמינות בוואטסאפ</a><a class="btn btn-primary" href="../contact/">השארת פרטים</a></div>
       </div>
     </section>
     <section class="section"><div class="container"><div class="section-heading"><div><h2>בחרו עיר</h2><p>אפשר לקבל הצעה גם לערים סמוכות בהתאם לזמינות.</p></div></div>$(AreaTagsHtml "../")</div></section>
@@ -564,7 +682,7 @@ foreach ($city in $cities) {
         <div class="breadcrumbs"><a href="../">דף הבית</a> / <a href="../azorei-sherut/">אזורי שירות</a></div>
         <h1>הובלות ב$($city.Name)</h1>
         <p>$($city.Angle)</p>
-        <div class="cta-row"><a class="btn btn-primary" href="#quote">קבל הצעת מחיר</a><a class="btn btn-green" href="$WhatsappUrl" data-whatsapp>וואטסאפ</a><a class="btn btn-light" href="$PhoneHref" data-call>התקשר</a></div>
+        <div class="cta-row"><a class="btn btn-primary" href="#quote">קבל הצעת מחיר</a><a class="btn btn-green" href="$WhatsappHref" data-whatsapp>וואטסאפ</a><a class="btn btn-light" href="$PhoneHref" data-call>התקשר</a></div>
       </div>
     </section>
     <section class="section">
@@ -576,7 +694,7 @@ foreach ($city in $cities) {
           <p>$($city.Areas). נותנים מענה גם לערים סמוכות בהתאם לזמינות.</p>
           <h2>איך מקבלים הצעה מהירה?</h2>
           <p>שלחו בוואטסאפ כמה פרטים: עיר איסוף, עיר יעד, מה מובילים, קומה, מעלית ותאריך רצוי. אם אפשר, צרפו תמונות של הפריטים או הארגזים.</p>
-          <div class="cta-row"><a class="btn btn-green" href="$WhatsappUrl" data-whatsapp>שליחת פרטים בוואטסאפ</a><a class="btn btn-outline" href="../hovalot-ktanot/">הובלות קטנות</a><a class="btn btn-outline" href="../hovalat-dira/">הובלת דירה</a></div>
+          <div class="cta-row"><a class="btn btn-green" href="$WhatsappHref" data-whatsapp>שליחת פרטים בוואטסאפ</a><a class="btn btn-outline" href="../hovalot-ktanot/">הובלות קטנות</a><a class="btn btn-outline" href="../hovalat-dira/">הובלת דירה</a></div>
           <h2>שאלות נפוצות על הובלות ב$($city.Name)</h2>
           <div class="faq">$(FaqHtml $faqs)</div>
         </article>
@@ -597,7 +715,7 @@ $contactBody = @"
         <div class="breadcrumbs"><a href="../">דף הבית</a> / צור קשר</div>
         <h1>צור קשר וקבלת הצעת מחיר</h1>
         <p>ספרו לנו מה מובילים, מאיפה ולאן, ונחזור עם כיוון מחיר וזמינות.</p>
-        <div class="cta-row"><a class="btn btn-green" href="$WhatsappUrl" data-whatsapp>וואטסאפ</a><a class="btn btn-light" href="$PhoneHref" data-call>התקשר עכשיו</a></div>
+        <div class="cta-row"><a class="btn btn-green" href="$WhatsappHref" data-whatsapp>וואטסאפ</a><a class="btn btn-light" href="$PhoneHref" data-call>התקשר עכשיו</a></div>
       </div>
     </section>
     <section class="section lead-section" id="quote"><div class="container lead-wrap"><div class="lead-copy"><h2>השאירו פרטים</h2><p>אפשר גם להתקשר ישירות ל-<span data-phone-text>$PhoneDisplay</span>.</p><ul class="lead-points"><li>הצעה לפי פרטי ההובלה בפועל.</li><li>מענה להובלות קטנות וגדולות.</li><li>אפשר לשלוח תמונות בוואטסאפ.</li></ul></div><div class="lead-panel">$(LeadFormHtml $false)</div></div></section>
@@ -637,7 +755,7 @@ Write-Page "blog/index.html" "בלוג הובלות ומדריכים | $Business
 foreach ($article in $articles) {
   $bullets = ($article.Bullets | ForEach-Object { "<li>$(HtmlEncode $_)</li>" }) -join ""
   $body = @"
-    <section class="page-hero"><div class="container"><div class="breadcrumbs"><a href="../../">דף הבית</a> / <a href="../">מדריכים</a></div><h1>$($article.Title)</h1><p>$($article.Intro)</p><div class="cta-row"><a class="btn btn-green" href="$WhatsappUrl" data-whatsapp>שאלו בוואטסאפ</a><a class="btn btn-light" href="$PhoneHref" data-call>התקשרו</a></div></div></section>
+    <section class="page-hero"><div class="container"><div class="breadcrumbs"><a href="../../">דף הבית</a> / <a href="../">מדריכים</a></div><h1>$($article.Title)</h1><p>$($article.Intro)</p><div class="cta-row"><a class="btn btn-green" href="$WhatsappHref" data-whatsapp>שאלו בוואטסאפ</a><a class="btn btn-light" href="$PhoneHref" data-call>התקשרו</a></div></div></section>
     <section class="section"><div class="container split"><article class="content"><h2>עיקרי הדברים</h2><p>$($article.Intro)</p><ul>$bullets</ul><h2>איך ממשיכים מכאן?</h2><p>כדי לקבל הצעת מחיר שמתאימה להובלה שלכם, שלחו פרטי איסוף ויעד, תאריך רצוי, רשימת ציוד ותמונות אם יש. כך אפשר לצמצם הפתעות ולתאם את העבודה בצורה מסודרת.</p></article><aside class="lead-panel sidebar-cta" id="quote"><h2>בדיקת מחיר מהירה</h2>$(LeadFormHtml $true)</aside></div></section>
 "@
   Write-Page "blog/$($article.Slug)/index.html" "$($article.Title) | מדריך הובלות | $BusinessName" "$($article.Intro) מדריך קצר לקבלת החלטה נכונה לפני הובלה." $body @()
@@ -655,7 +773,7 @@ $landingBody = @"
           <p class="eyebrow">$BusinessName - קמפיין הובלות במרכז</p>
           <h1>צריכים הובלה במרכז? קבלו הצעת מחיר מהירה וברורה</h1>
           <p>הובלות קטנות וגדולות, דירות, משרדים ופריטים בודדים. שלחו פרטים בוואטסאפ או השאירו טלפון ונחזור אליכם.</p>
-          <div class="cta-row"><a class="btn btn-green" href="$WhatsappUrl" data-whatsapp>וואטסאפ להצעת מחיר</a><a class="btn btn-light" href="$PhoneHref" data-call>התקשר עכשיו</a></div>
+          <div class="cta-row"><a class="btn btn-green" href="$WhatsappHref" data-whatsapp>וואטסאפ להצעת מחיר</a><a class="btn btn-light" href="$PhoneHref" data-call>התקשר עכשיו</a></div>
         </div>
       </div>
     </section>
