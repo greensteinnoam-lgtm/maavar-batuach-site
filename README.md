@@ -4,7 +4,7 @@
 
 ## עריכה מהירה
 
-- שם עסק, טלפון ווואטסאפ: `assets/js/main.js`
+- שם עסק, טלפון, וואטסאפ, אזורי שירות ושירותים: `site.config.json`
 - צבעים ועיצוב: `assets/css/styles.css`
 - תוכן עמודים, אזורי שירות ומאמרים: `tools/build-site.ps1`
 - תמונת Hero: `assets/images/hero-moving-team.png`
@@ -17,7 +17,7 @@ powershell -ExecutionPolicy Bypass -File tools/build-site.ps1
 
 ## פרסום
 
-האתר בנוי כקבצים סטטיים ולכן מתאים ל-GitHub Pages, Netlify, Cloudflare Pages או כל אחסון סטטי אחר. כרגע כתובת הבסיס מוגדרת ל-GitHub Pages; כשיהיה דומיין סופי כדאי להחליף אותו בתוך `tools/build-site.ps1`, ואז להריץ את המחולל שוב.
+האתר בנוי כקבצים סטטיים ולכן מתאים ל-GitHub Pages, Netlify, Cloudflare Pages או כל אחסון סטטי אחר. כרגע כתובת הבסיס מוגדרת ל-GitHub Pages בתוך `site.config.json`; כשיהיה דומיין סופי כדאי להחליף אותו שם, ואז להריץ את המחולל שוב.
 
 ## GitHub
 

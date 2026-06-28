@@ -1,0 +1,51 @@
+{
+  "siteUrl": "https://greensteinnoam-lgtm.github.io/maavar-batuach-site",
+  "businessName": "מעבר בטוח",
+  "contact": {
+    "phoneDisplay": "055-246-3716",
+    "phoneHref": "tel:+972552463716",
+    "whatsappUrl": "https://wa.me/972552463716",
+    "email": ""
+  },
+  "serviceAreas": {
+    "summary": "מרכז, שפלה, ירושלים, מאשקלון עד חיפה.",
+    "items": [
+      "מרכז",
+      "שפלה",
+      "ירושלים",
+      "מאשקלון עד חיפה"
+    ]
+  },
+  "services": [
+    {
+      "name": "הובלות קטנות",
+      "url": "hovalot-ktanot/",
+      "description": "כמה פריטים, מחסן, סטודיו קטן או העברה נקודתית."
+    },
+    {
+      "name": "הובלות דירה",
+      "url": "hovalat-dira/",
+      "description": "הובלת דירה מסודרת עם תיאום מראש ושמירה על הציוד."
+    },
+    {
+      "name": "הובלות משרדים",
+      "url": "hovalot-misradim/",
+      "description": "מעבר משרד, עמדות עבודה, ציוד מחשוב וארגזים."
+    },
+    {
+      "name": "פירוק והרכבת רהיטים",
+      "url": "piruk-harkava/",
+      "description": "פירוק רהיטים לפני ההובלה והרכבה במקום החדש לפי הצורך."
+    },
+    {
+      "name": "שירותי אריזה",
+      "url": "contact/",
+      "description": "סיוע באריזה, עטיפה והכנה של ציוד רגיש לפני יום המעבר."
+    },
+    {
+      "name": "הובלות מהיום להיום לפי זמינות",
+      "url": "contact/",
+      "description": "מענה להובלות דחופות כאשר יש זמינות ומתאפשר תיאום מהיר."
+    }
+  ]
+}

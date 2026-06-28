@@ -1,72 +1,83 @@
 (function () {
-  const config = {
-    businessName: "מעבר בטוח",
-    phoneDisplay: "055-2463716",
-    phoneHref: "0552463716",
-    whatsappNumber: "972552463716",
-    email: "",
-    defaultMessage:
-      "שלום, אני צריך הצעת מחיר להובלה. עיר איסוף: __ עיר יעד: __ מה מובילים: __ תאריך רצוי: __",
-  };
-
+  const script = document.currentScript;
   const qs = (selector, root = document) => root.querySelector(selector);
   const qsa = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 
-  function whatsappUrl(message) {
-    return `https://wa.me/${config.whatsappNumber}?text=${encodeURIComponent(message || config.defaultMessage)}`;
+  function configUrl() {
+    if (!script || !script.src) return "site.config.json";
+    return new URL("../../site.config.json", script.src).href;
   }
 
-  function updateContactLinks() {
-    qsa("[data-business-name]").forEach((node) => {
-      node.textContent = config.businessName;
-    });
+  async function loadConfig() {
+    try {
+      const response = await fetch(configUrl(), { cache: "no-cache" });
+      if (!response.ok) throw new Error("Config request failed");
+      return response.json();
+    } catch (error) {
+      return {};
+    }
+  }
 
-    qsa("[data-phone-text]").forEach((node) => {
-      node.textContent = config.phoneDisplay;
-    });
+  function contactConfig(config) {
+    return config.contact || {};
+  }
 
-    qsa("[data-call]").forEach((link) => {
-      link.setAttribute("href", `tel:${config.phoneHref}`);
-    });
+  function existingHref(selector) {
+    const link = qs(selector);
+    return link ? link.getAttribute("href") || "" : "";
+  }
 
-    qsa("[data-whatsapp]").forEach((link) => {
-      link.setAttribute("href", whatsappUrl(link.dataset.whatsappMessage));
-      link.setAttribute("target", "_blank");
-      link.setAttribute("rel", "noopener");
-    });
+  function updateContactLinks(config) {
+    const contact = contactConfig(config);
+    const businessName = config.businessName || "";
+    const phoneDisplay = contact.phoneDisplay || "";
+    const phoneHref = contact.phoneHref || existingHref("[data-call]");
+    const whatsappUrl = contact.whatsappUrl || existingHref("[data-whatsapp]");
+    const email = contact.email || "";
+
+    if (businessName) {
+      qsa("[data-business-name]").forEach((node) => {
+        node.textContent = businessName;
+      });
+    }
+
+    if (phoneDisplay) {
+      qsa("[data-phone-text]").forEach((node) => {
+        node.textContent = phoneDisplay;
+      });
+    }
+
+    if (phoneHref) {
+      qsa("[data-call]").forEach((link) => {
+        link.setAttribute("href", phoneHref);
+      });
+    }
+
+    if (whatsappUrl) {
+      qsa("[data-whatsapp]").forEach((link) => {
+        link.setAttribute("href", whatsappUrl);
+        link.setAttribute("target", "_blank");
+        link.setAttribute("rel", "noopener");
+      });
+    }
 
     qsa("[data-email]").forEach((link) => {
-      if (!config.email) {
+      if (!email) {
         link.remove();
         return;
       }
-      link.setAttribute("href", `mailto:${config.email}`);
-      link.textContent = config.email;
+
+      link.setAttribute("href", `mailto:${email}`);
+      link.textContent = email;
     });
   }
 
-  function formMessage(form) {
-    const data = new FormData(form);
-    const parts = [
-      "שלום, אני צריך הצעת מחיר להובלה.",
-      `שם: ${data.get("name") || ""}`,
-      `טלפון: ${data.get("phone") || ""}`,
-      `עיר איסוף: ${data.get("pickup") || ""}`,
-      `עיר יעד: ${data.get("destination") || ""}`,
-      `מה מובילים: ${data.get("items") || ""}`,
-      `תאריך רצוי: ${data.get("date") || ""}`,
-      `יש מעלית: ${data.get("elevator") || ""}`,
-      `צריך פירוק והרכבה: ${data.get("assembly") || ""}`,
-    ];
-
-    return parts.join("\n");
-  }
-
-  function bindForms() {
+  function bindForms(config) {
+    const whatsappUrl = contactConfig(config).whatsappUrl || existingHref("[data-whatsapp]");
     qsa("form[data-lead-form]").forEach((form) => {
       form.addEventListener("submit", (event) => {
         event.preventDefault();
-        window.open(whatsappUrl(formMessage(form)), "_blank", "noopener");
+        if (whatsappUrl) window.open(whatsappUrl, "_blank", "noopener");
       });
     });
   }
@@ -90,7 +101,9 @@
     });
   }
 
-  updateContactLinks();
-  bindForms();
   bindMenu();
+  loadConfig().then((config) => {
+    updateContactLinks(config);
+    bindForms(config);
+  });
 })();
